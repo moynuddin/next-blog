@@ -1,21 +1,50 @@
 import React from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { synthwave84 } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import PostHeader from "./post-header";
 import classes from "./post-content.module.css";
-const dummyPost = {
-  slug: "getting-started-with-nextjs-4",
-  title: "Getting strated",
-  image: "image2.jpg",
-  date: "2023-02-10",
-  content: "# This is a first post",
-};
 
-const PostContent = () => {
-  const imagePath = `/images/posts/${dummyPost.slug}/${dummyPost.image}`;
+const PostContent = (props) => {
+  const { post } = props;
+  const imagePath = `/images/posts/${post.slug}/${post.image}`;
+
+  const customRenderers = {
+    p(paragraph) {
+      const { node } = paragraph;
+      if (node.children[0].tagName === "img") {
+        const image = node.children[0];
+
+        return (
+          <div className={classes.image}>
+            <Image
+              src={`/images/posts/${post.slug}/${image.properties.src}`}
+              alt={image.alt}
+              width={600}
+              height={300}
+            />
+          </div>
+        );
+      }
+      return <p>{paragraph.children}</p>;
+    },
+
+    code(code) {
+      const { className, children } = code;
+      const language = className.split("-")[1];
+      return (
+        <SyntaxHighlighter style={synthwave84} language={language}>
+          {children}
+        </SyntaxHighlighter>
+      );
+    },
+  };
+
   return (
     <article className={classes.content}>
-      <PostHeader title={dummyPost.title} image={imagePath} />
-      <ReactMarkdown>{dummyPost.content}</ReactMarkdown>
+      <PostHeader title={post.title} image={imagePath} />
+      <ReactMarkdown components={customRenderers}>{post.content}</ReactMarkdown>
     </article>
   );
 };

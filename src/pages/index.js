@@ -8,7 +8,6 @@ import { getFeaturedPosts } from "lib/posts-util";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home(props) {
-  console.log(props.posts);
   return (
     <>
       <Head>
